@@ -1,0 +1,41 @@
+@import "../../scss/variables";
+
+.footContainer {
+    position: absolute;
+    width: 100%;
+    bottom:0;
+    .foot {
+        position: relative;
+        font-size: 12px;
+        color: greyy;            
+        bottom:0;
+        padding-top: 8px;
+        padding-bottom: 30px;
+        border-top: 1px solid grey;
+        text-align: center;
+    }
+}
+
+@media (max-width: $desktop-small-max) {
+    /* For smal deskdop */
+    .foot {
+        width: 96%;
+        margin-left: 2%;
+    }
+}
+
+@media (min-width: $desktop-small-max) and (max-width: $desktop-large-min){
+    /* For medium deskdop */
+    .foot {
+        width: 88%;
+        margin-left: 6%;
+    }
+}
+
+@media (min-width: $desktop-large-min){
+    /* For large deskdop */
+    .foot {
+        width: 80%;
+        margin-left: 10%;
+    }
+}

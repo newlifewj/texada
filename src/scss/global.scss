@@ -1,0 +1,94 @@
+@import "./variables";
+
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: rgb(40, 40, 40);
+    background-color: white;
+
+    #dip-ui-root {
+        position:relative;
+        min-height: 100%;
+    }
+
+    #app-container {
+
+        position: absolute;
+        
+        width: 100%;
+        min-height: 100%;
+        .virtual-container {
+            float: left !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            position: absolute;
+            width: 100%;
+            display: flex;
+            min-height: 100%;
+            min-width: $desktop-min-width;
+        }
+     }
+
+    .input-feedback {
+        font-size: 10px;
+        color: tomato;
+    }
+
+    .no-select {
+        user-select: none;
+    }
+
+    button:disabled {
+        color: grey !important;
+        &:hover {
+            cursor: auto !important;
+            background-color: inherit !important;
+        }
+    }
+
+    .err-msg {
+        color: firebrick;
+    }
+    
+    .bell-primary-btn {
+        background-color: $primary-color;
+        text-transform: none;
+        color: white;
+        &:hover {
+            background-color: $primary-color;
+        }
+    }
+
+    .clickable {
+        &:hover{
+            cursor: pointer;
+            color: $primary-color;
+            opacity: 0.6;
+        }
+    }
+
+    .noDecorationLink {
+        text-decoration: none;
+        color: inherit;
+        &:hover{
+            cursor: pointer;
+            color: $primary-color;
+            opacity: 0.6;
+        }
+    }
+
+
+    /* Make the label of input box larger */
+    .MuiInputLabel-outlined {
+        font-size: large !important;
+        background-color: white;
+        padding-right: 5px;
+        vertical-align: super !important;
+    }
+    
+    .MuiOutlinedInput-input {
+        // padding: 15px 30px 15px 20px !important;
+    }
+}

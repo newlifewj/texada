@@ -1,0 +1,89 @@
+@import "../../scss/variables";
+
+.head {
+    position: fixed;
+    z-index: 999;
+    padding: 5px 0px;
+    background-color: dimgray;
+    width: 100%;
+}
+
+.logo {
+    margin-right: 50px;
+    font-size: 40px;
+    vertical-align: super;
+    background-color: transparent;
+    background-image: url('../../assets/images/logo.gif');
+    background-position: 0px center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    &:hover {
+        opacity: 0.6;
+    }
+    color: transparent;
+}
+
+.navtab {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+.active {
+    background-color: lavender;
+    color: black;
+    margin-bottom: -5px;
+    border-bottom: 6px solid lavender;
+    &:hover {
+        opacity: 1;
+    }
+}
+
+
+.profile {
+    // display: inline-block;
+    float: right;
+    vertical-align: super;
+    padding: 8px 15px 3px 15px;
+    font-size: 12px;
+    i {
+        color: blue;
+    }
+}
+
+.signout {
+    float: right;
+    vertical-align: super;
+    padding: 8px 15px 3px 15px;
+    font-size: 13px;
+    cursor: pointer;
+    &:hover {
+        color: tomato;
+    }
+}
+
+@media (max-width: $desktop-small-max) {
+    /* For smal deskdop */
+    .container {
+        width: 96%;
+        margin: auto;
+    }
+}
+
+@media (min-width: $desktop-small-max) and (max-width: $desktop-large-min){
+    /* For medium deskdop */
+    .container {
+        width: 88%;
+        margin: auto;
+    }
+}
+
+@media (min-width: $desktop-large-min){
+    /* For large deskdop */
+    .container {
+        width: 80%;
+        margin: auto;
+    }
+}

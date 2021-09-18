@@ -1,0 +1,61 @@
+@import "../../scss/variables";
+
+.layout {
+    .alert {
+        font-size: 0.9em;
+        margin-bottom: 15px;
+        margin-top: 30px;
+        width: 100%;
+        display: flex;
+        padding: 8px 12px;
+        margin-left: -12px;
+    }
+}
+
+.tableCtrl {
+    margin-top: 10px;
+    background-color: $x-light-blue;
+    padding: 30px 0px;
+}
+
+.topTable {
+    margin: 15px 0px;
+}
+
+.table {
+    table-layout: fixed;
+    th {
+        font-size: 1em;
+        background-color: wheat;
+    }
+    td {
+        font-size: 0.9em !important;
+    }
+    tbody tr:nth-child(odd) {
+        background-color: $x-light-blue;
+    }  
+    
+}
+.cellExpand {
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.pagination {
+    position: absolute;
+    margin-top: -40px;
+    right: 0px;
+}
+
+.selects {
+    text-align: right;
+    margin-right: 20px;
+    vertical-align: text-top;
+}
+
+.operation {
+    margin-top: 30px
+}

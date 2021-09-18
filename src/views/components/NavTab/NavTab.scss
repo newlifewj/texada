@@ -1,0 +1,30 @@
+@import "../../../scss/variables";
+
+.tab {
+    display: inline-block;
+    vertical-align: bottom;
+    padding: 10px 15px 4px 15px;
+    color: white;
+    font-size: 13px;
+    border-radius: 5px 5px 0px 0px;
+    &:hover {
+        cursor: pointer;
+        opacity: 0.6;
+    }
+    &[invalid=true] {
+        cursor: default !important;
+        opacity: 0.6;
+    }
+    margin-top: 6px;
+}
+
+.active {
+    font-weight: 600;
+    background-color: white;
+    color: $primary-color;
+    margin-bottom: -5px;
+    border-bottom: 5px solid white;
+    &:hover {
+        opacity: 1;
+    }
+}
