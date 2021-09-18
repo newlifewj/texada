@@ -35,7 +35,8 @@ export default class BookModal extends React.Component {
             formValid: true,
             formFailed: false,
             formPristine: true,
-            formReady: false
+            formReady: false,
+            durabillityDecrease: 0
         };
 
         this.change = (e) => {
@@ -70,7 +71,18 @@ export default class BookModal extends React.Component {
                 this.setState({ formModel: { product: "", toDate: "", fromDate: "" }, formReady: false });
                 this.props.close();
             } else {
-                this.setState( { formReady: true } );
+                const start = moment(this.state.formModel.fromDate, "YYYY-MM-DD");
+                const end = moment(this.state.formModel.toDate, "YYYY-MM-DD");
+                const days = moment.duration(start.diff(end)).asDays();
+
+                let durabilityPoints = 0;
+                if (`${this.state.formModel.product.type}` === "plain") {
+                    durabilityPoints = days;
+                } else {
+                    durabilityPoints = 4 * days;
+                }
+
+                this.setState( { formReady: true, durabillityDecrease: durabilityPoints } );
             }
         };
 
@@ -99,9 +111,9 @@ export default class BookModal extends React.Component {
                                     value={this.state.formModel.product}
                                     onChange={this.change}
                                 >
-                                    <MenuItem value={10}>Air Compressor YL-444</MenuItem>
-                                    <MenuItem value={20}>Air Compressor BV-444</MenuItem>
-                                    <MenuItem value={30}>Bobcat skid steer B64</MenuItem>
+                                    { this.props.items.map( ( item, idx) => (
+                                        <MenuItem  key={`item-${idx}`} value={item}>{item.name}</MenuItem>
+                                    )) }
                                 </Select>
                             </FormControl>
                             <div style={{ marginTop: "30px" }}>
@@ -137,7 +149,8 @@ export default class BookModal extends React.Component {
                     }
                     { this.state.formReady &&
                         <div>
-                            Your estimated price is $####
+                            Your estimated price is ${this.state.formModel.product.price}
+                            <div>Durability points will be decreased <b style={{ color: "red" }}>{this.state.durabillityDecrease}</b></div>
                             <h4>Do you want to procedure?</h4>
                         </div>
                     }
@@ -149,7 +162,7 @@ export default class BookModal extends React.Component {
                         </Button>
                         <Button
                             disabled={ !this.state.formValid
-                                || this.state.formModel.product.length === 0
+                                || `${this.state.formModel.product}` === ""
                                 || this.state.formModel.fromDate.length === 0
                                 || this.state.formModel.toDate.length === 0 }
                             onClick={this.bookProduct} color="primary">

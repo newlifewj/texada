@@ -224,8 +224,8 @@ export default class Equipments extends React.Component {
                    
                 </div>
 
-                <BookModal open={this.state.book} close={(e) => this.setState({ book: false })} />
-                <ReturnModal open={this.state.return} close={(e) => this.setState({ return: false })} />
+                <BookModal open={this.state.book} close={(e) => this.setState({ book: false })} items={this.state.equipments} />
+                <ReturnModal open={this.state.return} close={(e) => this.setState({ return: false })} items={this.state.equipments} />
                 
             </div>
         );
