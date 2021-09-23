@@ -1,49 +1,71 @@
 
-import axios from 'axios';
+// import axios from 'axios';
 // import spinSev from '../views/components/Spin/SpinSev';
+/*  
+    --- Note ---
+    The commector is supposed to be the interface connecting with Http tier. But we don't have backend service now,
+    instead just using a local store in application context.
+*/
+import store from './LocalStore';
 
-import store from './StaticData';
-
+/**
+ * The entry to handle all exceptions including Http and code running.
+ * @param {object} err - The Error instance threw from API calls.
+ */
 const errorHandler = (err) => {
+    // ToDo: Not implemented yet, we don't simulate error scenarios.
     /*
-        403/statusCode==='403403': None authentication.
-        So the browser should be redirected to the IDP server auth-endpoint to complete Google OAuth2 work flow.
-        However, the XHR response cannot do redirection even its http status is 302
-        We have to define a protocol betwwen the XHR services and the UI, 'statusCode===403403' make UI set the location.
-        --- It is not regular redirection, but with same result. We call that SPA redirection --- 
-    */
-    if (err.response && err.response.data) {
-        if (err.response.headers['x-auth-endpoint']) {
-            // `${err.response.data.status.statusCode}` === '403403' now     // needn't check 403403 actually
-            // Navigate browser to Auth Endpoint, that's how SPA redirect to IDP basing one XHR 403 response
-            window.location.assign(err.response.headers['x-auth-endpoint']);
-        } else {
-            return err.response.data;
+    return {
+        status: {
+            statusCode: '404000',
+            message: 'Not Found'
         }
-    } else {
-        return err;
-    }
-    
+    };
+    */
 };
 
 export default ( function() {
     return {
-
-        get: ( path, config ) => {
-            const equipments = store.getAll();
-
+        search: (path, options) => {
+            const equipments = store.search(options.params.keyword);
             return {
                 payload: {
                     equipments: equipments,
                     totalEquipments: equipments.length,
-                    totalPages: 1
+                    totalPages: 1   // Just 1 big page now
                 },
                 status: {
                     statusCode: '200000',
                     message: 'success'
                 }
             };
-      
+        },
+
+        get: ( code ) => {
+            const equipment = store.getOne(code);
+
+            return {
+                payload: equipment,
+                status: {
+                    statusCode: '200000',
+                    message: 'success'
+                }
+            };
+        },
+
+        // post: () => {},  // No "create" method in the local store
+
+        // Lets use PUT, it could be PATCH in this scenario
+        put: (obj) => {
+            const equipment = store.update(obj);
+
+            return {
+                payload: equipment,
+                status: {
+                    statusCode: '200000',
+                    message: 'success'
+                }
+            };
         }
     };
 }() );

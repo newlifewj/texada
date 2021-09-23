@@ -15,6 +15,9 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
+import connector from '../../../services/Connector';
+import store from '../../../services/LocalStore';
+
 import style from './BookModal.scss';
 
 export default class BookModal extends React.Component {
@@ -67,22 +70,15 @@ export default class BookModal extends React.Component {
 
         this.bookProduct = () => {
             if (this.state.formReady) {
-                alert("Thank you, your product has been registered!");
-                this.setState({ formModel: { product: "", toDate: "", fromDate: "" }, formReady: false });
+                const response = connector.put({ ...this.state.formModel.product, availability: false });
+                
+                store.rent(response.payload, this.state.formModel.fromDate, this.state.formModel.toDate);
+                this.props.postUpdate(response.payload);
+
                 this.props.close();
+                this.setState( { formReady: false } );
             } else {
-                const start = moment(this.state.formModel.fromDate, "YYYY-MM-DD");
-                const end = moment(this.state.formModel.toDate, "YYYY-MM-DD");
-                const days = moment.duration(start.diff(end)).asDays();
-
-                let durabilityPoints = 0;
-                if (`${this.state.formModel.product.type}` === "plain") {
-                    durabilityPoints = days;
-                } else {
-                    durabilityPoints = 4 * days;
-                }
-
-                this.setState( { formReady: true, durabillityDecrease: durabilityPoints } );
+                this.setState( { formReady: true } );
             }
         };
 
@@ -111,11 +107,19 @@ export default class BookModal extends React.Component {
                                     value={this.state.formModel.product}
                                     onChange={this.change}
                                 >
-                                    { this.props.items.map( ( item, idx) => (
-                                        <MenuItem  key={`item-${idx}`} value={item}>{item.name}</MenuItem>
+                                    { this.props.items.filter( (item) => { return `${item.availability}` === "true"; } ).map( ( item, idx) => (
+                                            <MenuItem  key={`item-${idx}`} value={item}>{item.name}</MenuItem>
                                     )) }
                                 </Select>
                             </FormControl>
+                            <div>
+                                { `${this.state.formModel.product.mileage}` !== "null" && `${this.state.formModel.product.mileage}` !== "undefined"  &&
+                                    <h5>Mileage:&nbsp;{this.state.formModel.product.mileage}</h5>
+                                }
+                                { this.state.formModel.product.needing_repair && 
+                                    <h5 className={cx(style.warning)}>&#42;&nbsp;This equipment need repairing.</h5>
+                                }
+                            </div>
                             <div style={{ marginTop: "30px" }}>
                                 <TextField
                                     id="date-from"
@@ -149,8 +153,7 @@ export default class BookModal extends React.Component {
                     }
                     { this.state.formReady &&
                         <div>
-                            Your estimated price is ${this.state.formModel.product.price}
-                            <div>Durability points will be decreased <b style={{ color: "red" }}>{this.state.durabillityDecrease}</b></div>
+                            The estimated price is ${this.state.formModel.product.price}
                             <h4>Do you want to procedure?</h4>
                         </div>
                     }

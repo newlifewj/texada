@@ -15,6 +15,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
+import store from '../../../services/LocalStore';
 import style from './ReturnModal.scss';
 
 export default class ReturnModal extends React.Component {
@@ -22,11 +23,11 @@ export default class ReturnModal extends React.Component {
         super(props);
         this.state = {
             formModel: {
-                product: "",
+                rental: "",
                 mileage: ""
             },
             formError: {
-                product: null,
+                rental: null,
                 mileage: null
             },
             formSubmitting: false,
@@ -64,16 +65,27 @@ export default class ReturnModal extends React.Component {
 
         this.returnProduct = () => {
             if (this.state.formReady) {
-                alert("Thank you, your product has been returned!");
+                const product = this.state.formModel.rental.product;
+                const start = moment(this.state.formModel.rental.from, "YYYY-MM-DD");
+                const end = moment(this.state.formModel.rental.to, "YYYY-MM-DD");
+                const days = moment.duration(end.diff(start)).asDays() + 1;
+                // const days = moment.duration(this.state.formModel.rental.from.diff(this.state.formModel.rental.to)).asDays();
+                const mileage = `${product.mileage}` === "null" ? null :  parseInt(product.mileage) + parseInt(this.state.formModel.mileage);
+                const deltaDur = `${product.type}` === "plain" ? days : 2 * (days + Math.ceil(parseInt(this.state.formModel.mileage) / 10));
+
+                const response = store.update({ ...product, availability: true, durability: product.durability - deltaDur, mileage: mileage });
+                store.return(this.state.formModel.rental);
+                this.props.postUpdate(response.payload);
+
                 this.props.close();
-                this.setState({ formModel: { product: "", mileage: "" }, formReady: false });
+                this.setState( { formReady: false, formModel: {  rental: "", mileage: "" } } );
             } else {
                 this.setState( { formReady: true } );
             }
         };
 
         this.handleClose = () => {
-            this.setState({ formModel: { product: "", mileage: "" }, formReady: false });
+            this.setState({ formModel: { rental: "", mileage: "" }, formReady: false });
             this.props.close();
             
         };
@@ -94,13 +106,13 @@ export default class ReturnModal extends React.Component {
                                 <Select size="medium" style={{ minWidth: "320px", fontSize: "12px" }}
                                     labelId="select-return-product-label"
                                     id="select-return-product"
-                                    name="product"
-                                    value={this.state.formModel.product}
+                                    name="rental"
+                                    value={this.state.formModel.rental}
                                     onChange={this.change}
                                 >
-                                    <MenuItem value={10}>Air Compressor YL-444</MenuItem>
-                                    <MenuItem value={20}>Air Compressor BV-444</MenuItem>
-                                    <MenuItem value={30}>Bobcat skid steer B64</MenuItem>
+                                    { this.props.items.map( ( item, idx) => (
+                                            <MenuItem  key={`item-${idx}`} value={item}>{item.product.name}</MenuItem>
+                                    )) }
                                 </Select>
                             </FormControl>
                             <div style={{ marginTop: "30px" }}>
@@ -113,6 +125,7 @@ export default class ReturnModal extends React.Component {
                                     InputLabelProps={{
                                         shrink: true
                                     }}
+                                    disabled={this.state.formModel.rental.product && this.state.formModel.rental.product.type === "plain"}
                                     error={Boolean(this.state.formError['mileage'])}
                                     helperText={this.state.formError['mileage']}
                                 />
@@ -121,7 +134,8 @@ export default class ReturnModal extends React.Component {
                     }
                     { this.state.formReady &&
                         <div>
-                            Your total price is $####
+                            <h5>Rental period:&nbsp;{this.state.formModel.rental.from}&nbsp;to&nbsp;{this.state.formModel.rental.to}</h5>
+                            <h5>Total price:&nbsp;{this.state.formModel.rental.product.price}</h5>
                             <h4>Do you want to procedure?</h4>
                         </div>
                     }
@@ -133,8 +147,8 @@ export default class ReturnModal extends React.Component {
                         </Button>
                         <Button
                             disabled={ !this.state.formValid
-                                || this.state.formModel.product.length === 0
-                                || this.state.formModel.mileage.length === 0 }
+                                || this.state.formModel.rental === ""
+                                || ( this.state.formModel.mileage.length === 0 && this.state.formModel.rental.product && this.state.formModel.rental.product.type !== "plain")}
                             onClick={this.returnProduct} color="primary">
                             { !this.state.formReady && <span>Yes</span> }
                             { this.state.formReady && <span>Confirm</span> }

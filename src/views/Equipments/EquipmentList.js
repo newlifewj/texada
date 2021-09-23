@@ -20,6 +20,7 @@ import BookModal from '../components/BookModal/BookModal';
 import ReturnModal from '../components/ReturnModal/ReturnModal';
 
 import connector from '../../services/Connector';
+import store from '../../services/LocalStore';
 
 import style from './Equipments.scss';
 
@@ -32,6 +33,7 @@ export default class Equipments extends React.Component {
                 keyword: ""
             },
             equipments: [],
+            rentals: store.getRentals(),
             totalEquipments: 0,
             totalPages: 1,
             expandedRow: null,
@@ -40,9 +42,11 @@ export default class Equipments extends React.Component {
             return: false
         };
 
-        this.searchEquipments = async(q) => {
+        this.searchEquipments = (q) => {
             const qry = q ? q : this.state.query;
-            const resObj = await connector.get( `${joinURL(config.apiRoot, config.apiUrl.equipments)}`, { params: qry } );
+            // console.log(JSON.stringify(q));
+            const resObj = connector.search( `${joinURL(config.apiRoot, config.apiUrl.equipments)}`, { params: qry } );
+            
             this.setState({
                 error: null,
                 equipments: resObj['payload']['equipments'],
@@ -53,27 +57,6 @@ export default class Equipments extends React.Component {
                     keyword: qry && qry['keyword'] ? qry['keyword'] : ""
                 }
             });
-            /* --- Cannot finish it without API call
-            if (resObj.payload && `${resObj.status.statusCode}` === "200000") {
-                this.setState({
-                    error: null,
-                    equipments: resObj['payload']['equipments'],
-                    totalEquipments: resObj['payload']['totalEquipments'],
-                    totalPages: resObj['payload']['totalPages'],
-                    query: {
-                        page: qry && qry.page && !isNaN(qry.page) ? parseInt(qry.page) : 1,
-                        keyword: qry && qry['keyword'] ? qry['keyword'] : ""
-                    }
-                });
-            } else if (resObj.status && `${resObj.status.statusCode}` === "404000") {
-                this.setState({ error: { type: "warning", message: "No equipments found due to - 404000 response" } });
-            } else if (resObj.status && `${resObj.status.statusCode}` === "400000") {
-                this.setState({ error: { type: "error", message: "Cannot retrieve equipments due to bad request - Error code is 400000" } });
-            } else {
-                // this.setState({ error: { type: "error", message: "Opps, something was wrong in server side - Error code is 500000" } });
-            }
-            */
-            
         };
 
         this.handleClose = () => {};
@@ -99,6 +82,11 @@ export default class Equipments extends React.Component {
             const _query = this.state.query;
             _query[e.target.name] = e.target.value.trim();
             this.setState( { query: _query } );
+        };
+
+        this.postUpdate = (obj) => {
+            const response = connector.search("", { params: this.state.query });
+            this.setState( { equipments: response.payload.equipments, rentals: store.getRentals() } );
         };
 
         this.expandRow = (idx, e) => {
@@ -189,10 +177,10 @@ export default class Equipments extends React.Component {
                                             <span>{equipment.code}</span>
                                         </TableCell>
                                         <TableCell>
-                                            <span>{`${equipment.availability}`}</span>
+                                            <span>{`${equipment.availability}` === "true" ? "Yes" : "No"}</span>
                                         </TableCell>
                                         <TableCell>
-                                            <span>{`${equipment.needing_repair}`}</span>
+                                            <span>{`${equipment.needing_repair}` === "true" ? "Yes" : "No"}</span>
                                         </TableCell>
                                         <TableCell>
                                             {`${equipment.durability}/${equipment.max_durability}`}
@@ -210,6 +198,7 @@ export default class Equipments extends React.Component {
 
                     <div className={cx(style.operation)}>
                         <Button  id="return-equipment-btn" variant="contained" color="primary"
+                                disabled={this.state.rentals.length === 0}
                                 onClick={(e) => this.setState({ return: true }) }
                                 style={{ margin: '15px 0px 5px 0px', float: 'right' }}>
                             Return
@@ -224,9 +213,18 @@ export default class Equipments extends React.Component {
                    
                 </div>
 
-                <BookModal open={this.state.book} close={(e) => this.setState({ book: false })} items={this.state.equipments} />
-                <ReturnModal open={this.state.return} close={(e) => this.setState({ return: false })} items={this.state.equipments} />
-                
+                <BookModal
+                    open={this.state.book} 
+                    close={(e) => this.setState({ book: false })} 
+                    items={this.state.equipments}
+                    postUpdate={this.postUpdate}
+                />
+                <ReturnModal
+                    open={this.state.return}
+                    close={(e) => this.setState({ return: false })}
+                    items={this.state.rentals}
+                    postUpdate={this.postUpdate}
+                />
             </div>
         );
     }
