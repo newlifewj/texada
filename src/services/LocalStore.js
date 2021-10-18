@@ -47,7 +47,7 @@ const store = {
 
         if (`${idx}` !== "undefined") {
             // Make it work for PATCH
-            const newObj = {...equipments[idx], ...obj};
+            const newObj = { ...equipments[idx], ...obj };
             equipments.splice(idx, 1, newObj);
             return newObj;
         } else {
